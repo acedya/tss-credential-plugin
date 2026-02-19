@@ -145,18 +145,54 @@ grant_type=password&username={username}&password={password}&domain={domain}
 ### Running Tests
 
 ```bash
-# Install dependencies and run all tests
-make test
+# Full local CI parity (lint + test with coverage + build)
+make ci
+
+# Run only CI-equivalent lint checks
+make lint
+
+# Run only CI-equivalent tests with coverage.xml
+make test-ci
+
+# Build distributions and validate metadata
+make release-check
 
 # Run tests with verbose output
 make test-verbose
 
-# Only install dependencies
-make install
-
 # Clean up
 make clean
 ```
+
+### CI/Release Design Concept
+
+- The Makefile is the single source of truth for commands.
+- GitHub workflows call `make` targets directly, instead of duplicating shell commands.
+- This guarantees local reproducibility:
+  - `ci.yml` behavior ⇔ `make ci`
+  - `release.yml` build/check behavior ⇔ `make release-check`
+- Publishing in GitHub Actions uses OIDC Trusted Publishing.
+- Local token-based publish commands are provided as a fallback:
+  - `make publish-testpypi-token TEST_PYPI_API_TOKEN=...`
+  - `make publish-pypi-token PYPI_API_TOKEN=...`
+
+### Safe Tag Creation for Releases
+
+Use the helper script through Makefile:
+
+```bash
+# Create local validated tag
+make release-tag TAG=v0.2.1
+
+# Create and push validated tag
+make release-tag TAG=v0.2.1 PUSH=1
+```
+
+The helper performs:
+- strict `vX.Y.Z` semver validation
+- clean working tree check
+- duplicate tag checks (local + origin)
+- `make ci` before tag creation
 
 ### Test Cases
 

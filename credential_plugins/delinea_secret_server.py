@@ -92,7 +92,11 @@ def _get_access_token(
             f"Response keys: {list(data.keys())}"
         )
 
-    return data["access_token"]
+    token = data["access_token"]
+    if not isinstance(token, str):
+        raise TypeError("Secret Server token response 'access_token' must be a string")
+
+    return token
 
 
 def backend(credential_params: Dict[str, Any]) -> Dict[str, str]:
