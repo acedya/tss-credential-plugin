@@ -31,7 +31,7 @@ INPUTS = {
         },
         {
             "id": "username",
-            "label": "Nom de l'utilisateur",
+            "label": "Username",
             "help_text": "The (Application) user username",
             "type": "string",
         },
@@ -43,7 +43,7 @@ INPUTS = {
         },
         {
             "id": "password",
-            "label": "Mot de passe",
+            "label": "Password",
             "help_text": "The corresponding password",
             "type": "string",
             "secret": True,
