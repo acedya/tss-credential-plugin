@@ -236,8 +236,8 @@ make lint             # lint checks only
 
 | Workflow | Trigger | Jobs |
 |----------|---------|------|
-| `ci.yml` | Push to `main`/`develop`, PRs | Test (matrix: 3.10, 3.11), Lint, Build |
-| `release.yml` | Push to `develop`, tag `v*.*.*` | TestPyPI (develop), PyPI + GitHub Release (tags) |
+| `ci.yml` | Push to `main`, pull requests | Test (matrix: 3.10, 3.11), Lint, Build |
+| `release.yml` | Tag `v*.*.*`, manual dispatch | PyPI + GitHub Release (tags), TestPyPI (manual) |
 
 ### Trusted Publishing Setup
 
@@ -253,8 +253,8 @@ Create two trusted publisher configurations on [pypi.org](https://pypi.org) and 
 | Environment | `pypi` (production) / `testpypi` (staging) |
 
 **Publish triggers:**
-- **TestPyPI**: every push to `develop`
 - **PyPI + GitHub Release**: strict `vX.Y.Z` tags, only if the tagged commit is on `main`
+- **TestPyPI**: manual workflow dispatch (for pre-release validation)
 
 Release notes are populated from `CHANGELOG.md`.
 
@@ -271,14 +271,17 @@ make publish-pypi-token PYPI_API_TOKEN=pypi-...
 
 ## Release Process
 
-### Branching Model (gitflow-lite)
+### Branching Model — [GitHub Flow](https://docs.github.com/en/get-started/using-github/github-flow)
 
-| Branch | Purpose |
-|--------|---------|
-| `main` | Production — always releasable |
-| `develop` | Integration — merges trigger TestPyPI publish |
-| `feature/*` | New work — PR into `develop` |
-| `hotfix/*` | Urgent fixes — PR into `main` (and back-merge to `develop`) |
+This project follows **GitHub Flow**, the simplest branching model:
+
+1. **`main`** is always deployable
+2. **Create a branch** from `main` with a descriptive name (e.g. `add-ssl-toggle`, `fix-token-parsing`)
+3. **Commit** your changes and push early for visibility
+4. **Open a pull request** to start discussion and trigger CI
+5. **Review & approve** — CI must pass, at least one approval required
+6. **Merge to `main`** — branch is deleted after merge
+7. **Tag & release** when ready: `make release-tag TAG=vX.Y.Z PUSH=1`
 
 ### Creating a Release
 
@@ -353,16 +356,11 @@ Apply these in GitHub UI: **Settings → Rules → Rulesets**.
 
 ### Branch Protection
 
-**`main` (production):**
+**`main`:**
 - Require pull request with at least 1 approval
 - Dismiss stale approvals on new commits
 - Require status checks: CI jobs from `ci.yml`
 - Require conversation resolution
-- Block force pushes and branch deletion
-
-**`develop` (integration):**
-- Require pull request
-- Require status checks from `ci.yml`
 - Block force pushes and branch deletion
 
 ### Tag Protection
@@ -384,10 +382,10 @@ Apply these in GitHub UI: **Settings → Rules → Rulesets**.
 
 ### Workflow
 
-1. Fork & branch from `develop` (`feature/my-feature`)
-2. Run `make format` before committing
-3. Ensure `make ci` passes
-4. Open a PR to `develop`
+1. Create a branch from `main` with a descriptive name
+2. Make changes, run `make format` before committing
+3. Push and open a pull request — CI runs automatically
+4. Get review, iterate, then merge to `main`
 
 ### Roadmap
 

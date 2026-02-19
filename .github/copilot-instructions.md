@@ -67,6 +67,15 @@ When writing new tests:
 - `credential_type/` — YAML reference files (not used at runtime)
 - `examples/` — sample Ansible playbooks
 
+## Branching Model
+
+This project follows **GitHub Flow** (https://docs.github.com/en/get-started/using-github/github-flow):
+- `main` is always deployable — all work branches from and merges back to `main`
+- Create descriptive branch names (e.g. `add-ssl-toggle`, `fix-token-parsing`)
+- Open pull requests for review — CI must pass before merge
+- No `develop` or long-lived integration branches
+- Releases are tagged from `main` only
+
 ## Release Process
 
 - Versioning: strict semantic versioning (`vX.Y.Z` tags)
