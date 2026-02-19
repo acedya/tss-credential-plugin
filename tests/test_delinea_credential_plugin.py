@@ -1,13 +1,14 @@
 """Unit tests for the Delinea Secret Server credential plugin."""
 
 import json
+
 import pytest
 import responses
 
 from credential_plugins.delinea_secret_server import (
+    TOKEN_ENDPOINT,
     _get_access_token,
     backend,
-    TOKEN_ENDPOINT,
 )
 
 FAKE_SERVER = "https://myserver.example.com/SecretServer"
