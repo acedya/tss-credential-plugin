@@ -1,4 +1,4 @@
-# Delinea Secret Server — AAP/AWX Credential Plugin test
+# Delinea Secret Server — AAP/AWX Credential Plugin
 
 ## Project Overview
 
