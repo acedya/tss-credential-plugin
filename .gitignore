@@ -1,0 +1,41 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Packaging/build artifacts
+build/
+dist/
+*.egg-info/
+pip-wheel-metadata/
+
+# Test/cache artifacts
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Environment/config
+.env
+.env.*
+
+# IDE/editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+
+# Project-local generated folder (accidental nested copy)
+tss-credential-plugin/

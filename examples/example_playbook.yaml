@@ -1,0 +1,19 @@
+---
+- name: Retrieve a secret from Delinea Secret Server
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Fetch secret by ID using injected token
+      ansible.builtin.debug:
+        msg: >-
+          The secret value is:
+          {{ lookup('delinea.ss.tss', 42,
+                    server_url=tss_server_url,
+                    token=tss_token) }}
+
+    - name: Use environment variables instead (alternative)
+      ansible.builtin.debug:
+        msg: >-
+          Server: {{ lookup('env', 'TSS_SERVER_URL') }}
+          Token:  {{ lookup('env', 'TSS_TOKEN') }}
