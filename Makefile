@@ -24,7 +24,7 @@ init: ## Create __init__.py files and requirements.txt if missing
 		echo "responses>=0.22"  >> $(REQUIREMENTS); \
 		echo "$(REQUIREMENTS) created."; \
 	fi
-	@echo "Project structure initialised."
+	@echo "Project structure initialized."
 
 install: ## Install Python dependencies from requirements.txt
 	$(PIP) install -r $(REQUIREMENTS)

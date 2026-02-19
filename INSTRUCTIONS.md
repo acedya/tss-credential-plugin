@@ -186,7 +186,7 @@ dependencies:
   
 additional_build_steps:
   append:
-    - COPY credential_plugins /usr/local/lib/python3.9/site-packages/credential_plugins
+    - COPY credential_plugins /usr/local/lib/python3/site-packages/credential_plugins
 ```
 
 Build and publish:
