@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "awx-delinea-secret-server-credential-plugin"
-version = "0.2.0"
+version = "0.2.2"
 description = "AWX/AAP credential plugin for Delinea (Thycotic) Secret Server"
 readme = "README.md"
 license = "Apache-2.0"

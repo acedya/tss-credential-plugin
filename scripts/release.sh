@@ -73,6 +73,17 @@ if git ls-remote --tags origin "refs/tags/$TAG" | grep -q "$TAG"; then
   exit 1
 fi
 
+# Strip the leading "v" to get the PEP 440 version
+VERSION="${TAG#v}"
+
+# Sync the version in pyproject.toml to match the tag
+echo "Setting version in pyproject.toml to $VERSION ..."
+sed -i "s/^version = \".*\"/version = \"$VERSION\"/" pyproject.toml
+
+# Stage the version bump so CI sees a clean tree after commit
+git add pyproject.toml
+git commit -m "chore: bump version to $VERSION"
+
 echo "Running CI-equivalent checks before tagging..."
 make ci
 
