@@ -1,15 +1,22 @@
 """Unit tests for the Delinea Secret Server credential plugin."""
 
+import sys
 from unittest.mock import MagicMock, patch
 
 import pytest
 
+import credential_plugins.delinea_secret_server  # noqa: F401
 from credential_plugins.delinea_secret_server import (
     INPUTS,
     _get_authorizer,
     backend,
     delinea_secret_server,
 )
+
+# The __init__.py re-export shadows the module name on the package object,
+# so ``import credential_plugins.delinea_secret_server as mod`` returns the
+# CredentialPlugin namedtuple.  Grab the real module from sys.modules.
+_plugin_mod = sys.modules["credential_plugins.delinea_secret_server"]
 
 FAKE_SERVER = "https://myserver.example.com/SecretServer"
 FAKE_TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.fakepayload.fakesig"
@@ -18,14 +25,14 @@ FAKE_TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.fakepayload.fakesig"
 # ── _get_authorizer tests ───────────────────────────────────────────────
 
 
-@patch("credential_plugins.delinea_secret_server.PasswordGrantAuthorizer")
+@patch.object(_plugin_mod, "PasswordGrantAuthorizer")
 def test_get_authorizer_without_domain(mock_cls):
     """Uses PasswordGrantAuthorizer when domain is not provided."""
     _get_authorizer(FAKE_SERVER, "appuser", "s3cret")
     mock_cls.assert_called_once_with(FAKE_SERVER, "appuser", "s3cret")
 
 
-@patch("credential_plugins.delinea_secret_server.DomainPasswordGrantAuthorizer")
+@patch.object(_plugin_mod, "DomainPasswordGrantAuthorizer")
 def test_get_authorizer_with_domain(mock_cls):
     """Uses DomainPasswordGrantAuthorizer when domain is provided."""
     _get_authorizer(FAKE_SERVER, "appuser", "s3cret", domain="MYDOMAIN")
@@ -35,7 +42,7 @@ def test_get_authorizer_with_domain(mock_cls):
 # ── backend() tests ─────────────────────────────────────────────────────
 
 
-@patch("credential_plugins.delinea_secret_server.PasswordGrantAuthorizer")
+@patch.object(_plugin_mod, "PasswordGrantAuthorizer")
 def test_backend_returns_token(mock_cls):
     """backend() returns the OAuth2 token when identifier is 'token'."""
     mock_cls.return_value = MagicMock(token=FAKE_TOKEN)
@@ -51,7 +58,7 @@ def test_backend_returns_token(mock_cls):
     assert isinstance(result, str)
 
 
-@patch("credential_plugins.delinea_secret_server.PasswordGrantAuthorizer")
+@patch.object(_plugin_mod, "PasswordGrantAuthorizer")
 def test_backend_defaults_to_token(mock_cls):
     """backend() defaults to 'token' when identifier is not specified."""
     mock_cls.return_value = MagicMock(token=FAKE_TOKEN)
@@ -65,7 +72,7 @@ def test_backend_defaults_to_token(mock_cls):
     assert result == FAKE_TOKEN
 
 
-@patch("credential_plugins.delinea_secret_server.DomainPasswordGrantAuthorizer")
+@patch.object(_plugin_mod, "DomainPasswordGrantAuthorizer")
 def test_backend_token_with_domain(mock_cls):
     """backend() uses DomainPasswordGrantAuthorizer when domain is provided."""
     mock_cls.return_value = MagicMock(token=FAKE_TOKEN)
@@ -106,7 +113,7 @@ def test_backend_raises_on_unknown_identifier():
         )
 
 
-@patch("credential_plugins.delinea_secret_server.PasswordGrantAuthorizer")
+@patch.object(_plugin_mod, "PasswordGrantAuthorizer")
 def test_backend_password_not_in_output(mock_cls):
     """The raw password must NEVER appear in the plugin output."""
     mock_cls.return_value = MagicMock(token=FAKE_TOKEN)
@@ -128,7 +135,7 @@ def test_backend_password_not_in_output(mock_cls):
     assert "s3cret" not in url_result
 
 
-@patch("credential_plugins.delinea_secret_server.PasswordGrantAuthorizer")
+@patch.object(_plugin_mod, "PasswordGrantAuthorizer")
 def test_backend_sdk_error_propagates(mock_cls):
     """SDK authentication errors propagate to AWX."""
     mock_cls.side_effect = Exception("Authentication failed")
