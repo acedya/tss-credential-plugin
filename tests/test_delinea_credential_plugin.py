@@ -45,7 +45,7 @@ def test_get_authorizer_with_domain(mock_cls):
 @patch.object(_plugin_mod, "PasswordGrantAuthorizer")
 def test_backend_returns_token(mock_cls):
     """backend() returns the OAuth2 token when identifier is 'token'."""
-    mock_cls.return_value = MagicMock(token=FAKE_TOKEN)
+    mock_cls.return_value = MagicMock(get_access_token=MagicMock(return_value=FAKE_TOKEN))
 
     result = backend(
         base_url=FAKE_SERVER,
@@ -61,7 +61,7 @@ def test_backend_returns_token(mock_cls):
 @patch.object(_plugin_mod, "PasswordGrantAuthorizer")
 def test_backend_defaults_to_token(mock_cls):
     """backend() defaults to 'token' when identifier is not specified."""
-    mock_cls.return_value = MagicMock(token=FAKE_TOKEN)
+    mock_cls.return_value = MagicMock(get_access_token=MagicMock(return_value=FAKE_TOKEN))
 
     result = backend(
         base_url=FAKE_SERVER,
@@ -75,7 +75,7 @@ def test_backend_defaults_to_token(mock_cls):
 @patch.object(_plugin_mod, "DomainPasswordGrantAuthorizer")
 def test_backend_token_with_domain(mock_cls):
     """backend() uses DomainPasswordGrantAuthorizer when domain is provided."""
-    mock_cls.return_value = MagicMock(token=FAKE_TOKEN)
+    mock_cls.return_value = MagicMock(get_access_token=MagicMock(return_value=FAKE_TOKEN))
 
     result = backend(
         base_url=FAKE_SERVER,
@@ -116,7 +116,7 @@ def test_backend_raises_on_unknown_identifier():
 @patch.object(_plugin_mod, "PasswordGrantAuthorizer")
 def test_backend_password_not_in_output(mock_cls):
     """The raw password must NEVER appear in the plugin output."""
-    mock_cls.return_value = MagicMock(token=FAKE_TOKEN)
+    mock_cls.return_value = MagicMock(get_access_token=MagicMock(return_value=FAKE_TOKEN))
 
     token_result = backend(
         base_url=FAKE_SERVER,

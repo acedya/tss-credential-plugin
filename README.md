@@ -179,6 +179,18 @@ with those injectors, then link its fields to this plugin (see [Credential Linki
   AWX entry point called at job launch. Receives all `fields` and `metadata` as keyword arguments.
   Returns a **single string** based on the `identifier` metadata dropdown value (`token` or `base_url`).
 
+### Self-Signed Certificates
+
+When using a self-signed certificate for SSL, the `REQUESTS_CA_BUNDLE` environment variable should be set to the path of the certificate (in `.pem` format). This will negate the need to ignore SSL certificate verification, which makes your application vulnerable.
+
+```bash
+export REQUESTS_CA_BUNDLE=/path/to/your/ca-bundle.pem
+```
+
+Please reference the [requests documentation](https://requests.readthedocs.io/en/latest/user/advanced/#ssl-cert-verification) for further details on the `REQUESTS_CA_BUNDLE` environment variable, should you require it.
+
+> **Note:** On RHEL / CentOS systems the system CA bundle is typically located at `/etc/pki/tls/cert.pem`.
+
 ---
 
 ## Testing
@@ -313,9 +325,12 @@ The plugin must be installed inside **both** controller containers (`automation-
 **Install from GitHub (quickest):**
 
 ```bash
-podman exec -it automation-controller-web awx-python -m pip install git+https://github.com/acedya/tss-credential-plugin.git
-podman exec -it automation-controller-task awx-python -m pip install git+https://github.com/acedya/tss-credential-plugin.git
-podman exec -it automation-controller-web awx-manage setup_managed_credential_types
+podman exec -it -u 0 automation-controller-web awx-python -m pip install git+https://github.com/acedya/tss-credential-plugin.git --force-reinstall
+podman exec -it -u 0 automation-controller-task awx-python -m pip install git+https://github.com/acedya/tss-credential-plugin.git --force-reinstall
+podman exec -it -u 0 automation-controller-web awx-manage setup_managed_credential_types
+podman exec -it -u 0 automation-controller-task awx-manage setup_managed_credential_types
+podman restart automation-controller-web
+podman restart automation-controller-task
 ```
 
 **Install from a local wheel:**
@@ -332,11 +347,14 @@ podman cp /tmp/awx_delinea_secret_server_credential_plugin-*.whl automation-cont
 podman cp /tmp/awx_delinea_secret_server_credential_plugin-*.whl automation-controller-task:/tmp/
 
 # Install
-podman exec -it automation-controller-web awx-python -m pip install /tmp/awx_delinea_secret_server_credential_plugin-*.whl
-podman exec -it automation-controller-task awx-python -m pip install /tmp/awx_delinea_secret_server_credential_plugin-*.whl
+podman exec -it -u 0 automation-controller-web awx-python -m pip install /tmp/awx_delinea_secret_server_credential_plugin-*.whl
+podman exec -it -u 0 automation-controller-task awx-python -m pip install /tmp/awx_delinea_secret_server_credential_plugin-*.whl
 
 # Register
-podman exec -it automation-controller-web awx-manage setup_managed_credential_types
+podman exec -it -u 0 automation-controller-web awx-manage setup_managed_credential_types
+podman exec -it -u 0 automation-controller-task awx-manage setup_managed_credential_types
+podman restart automation-controller-web
+podman restart automation-controller-task
 ```
 
 > **Note:** `pip install` inside containers is ephemeral — reinstall after container restarts, or build a custom controller image for persistence.
@@ -523,11 +541,7 @@ Apply these in GitHub UI: **Settings → Rules → Rulesets**.
 
 ### Roadmap
 
-- [ ] Client credentials grant (SDK-based auth)
-- [ ] Configurable `verify_ssl` toggle in credential input
-- [ ] Token caching for rapid successive lookups
 - [ ] Custom Execution Environment image with plugin pre-installed
-- [ ] Integration tests against a real Secret Server instance
 
 ---
 

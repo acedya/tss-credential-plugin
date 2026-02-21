@@ -52,17 +52,21 @@ format: install-dev ## Auto-format source and tests (black + isort)
 	$(ISORT) $(SRC_DIR) $(TEST_DIR)
 
 # ── Testing ──────────────────────────────────────────────────
-test: install-dev ## Run all unit tests
-	$(PYTEST) $(TEST_DIR) -v --tb=short
+test: install-dev ## Run unit tests (excludes integration)
+	$(PYTEST) $(TEST_DIR) -v --tb=short --ignore=$(TEST_DIR)/test_integration.py
 
-test-ci: install-dev ## Run CI-equivalent tests with coverage XML
-	$(PYTEST) $(TEST_DIR) -v --tb=short --cov=$(SRC_DIR) --cov-report=term-missing --cov-report=xml
+test-ci: install-dev ## Run CI-equivalent tests with coverage XML (excludes integration)
+	$(PYTEST) $(TEST_DIR) -v --tb=short --ignore=$(TEST_DIR)/test_integration.py --cov=$(SRC_DIR) --cov-report=term-missing --cov-report=xml
 
-test-verbose: install-dev ## Run all unit tests with full output
-	$(PYTEST) $(TEST_DIR) -v --tb=long -s
+test-integration: install-dev ## Run integration tests against a live Secret Server (requires .env)
+	@if [ ! -f .env ]; then echo "ERROR: .env file not found. Copy .env.example to .env and fill in credentials."; exit 1; fi
+	@set -a && . ./.env && set +a && $(PYTEST) $(TEST_DIR)/test_integration.py -v -s --tb=short
 
-test-only: ## Run tests without installing dependencies (faster)
-	$(PYTEST) $(TEST_DIR) -v --tb=short
+test-verbose: install-dev ## Run unit tests with full output (excludes integration)
+	$(PYTEST) $(TEST_DIR) -v --tb=long -s --ignore=$(TEST_DIR)/test_integration.py
+
+test-only: ## Run unit tests without installing dependencies (faster)
+	$(PYTEST) $(TEST_DIR) -v --tb=short --ignore=$(TEST_DIR)/test_integration.py
 
 # ── Code quality ─────────────────────────────────────────────
 lint: install-dev ## Run CI-equivalent lint checks

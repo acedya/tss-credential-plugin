@@ -115,7 +115,7 @@ def backend(**kwargs: Any) -> str:
 
     if identifier == "token":
         authorizer = _get_authorizer(base_url, username, password, domain)
-        token: str = authorizer.token
+        token: str = authorizer.get_access_token()
         return token
 
     raise ValueError(f"Unknown identifier '{identifier}'. " f"Valid values: 'token', 'base_url'.")
