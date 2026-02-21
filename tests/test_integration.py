@@ -14,8 +14,8 @@ Optional:
 import os
 import traceback
 
-import requests
 import pytest
+import requests
 
 from credential_plugins.delinea_secret_server import _get_authorizer, backend
 
@@ -68,6 +68,7 @@ def _diagnose_connectivity():
     print(f"\n  [SSL bypass test] GET {BASE_URL}/api/v1/healthcheck (verify=False)")
     try:
         import urllib3
+
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         r = requests.get(BASE_URL.rstrip("/") + "/api/v1/healthcheck", timeout=10)
         print(f"    Status : {r.status_code}")
@@ -147,7 +148,9 @@ class TestBackend:
                 domain=DOMAIN,
                 identifier="token",
             )
-            print(f"\n  backend(identifier='token') returned (length={len(result)}): {result[:40]}...")
+            print(
+                f"\n  backend(identifier='token') returned (length={len(result)}): {result[:40]}..."
+            )
             assert isinstance(result, str)
             assert len(result) > 0
         except Exception as exc:
@@ -178,7 +181,7 @@ class TestBackend:
                 domain=DOMAIN,
                 identifier="token",
             )
-            print(f"\n  Token obtained, verifying password is not in output...")
+            print("\n  Token obtained, verifying password is not in output...")
             assert PASSWORD not in token
         except Exception as exc:
             print(f"\n  backend() FAILED: {type(exc).__name__}: {exc}")
